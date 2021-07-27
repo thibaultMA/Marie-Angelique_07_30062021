@@ -13,7 +13,7 @@ router.get('/email/:email',userAdmin.getOneEmail)
 router.put('/update/:id',userAdmin.updateOne)
 //delete
 router.delete('/delete/:id',userAdmin.deleteOne)
-
+ 
 //**************************************************
 
 //login

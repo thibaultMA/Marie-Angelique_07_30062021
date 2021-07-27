@@ -51,13 +51,13 @@ exports.getOneEmail = (req, res, next) => {
 exports.updateOne = (req, res, next) => {
   let change = req.body;
   // console.log(change);
-  let sqlDebut = `UPDATE users SET ?`;
-  let sqlFin = ` WHERE id = '${req.params.id}'`
-  console.log(sqlDebut,change,sqlFin);
-  // let query = db.query(sql, (err, result) => {
-  //   if (err) throw err;
-  //   res.send("result");
-  // });
+  let sql = `UPDATE users SET email = '${change.email}' , name = '${change.userName}'  WHERE id = '${req.params.id}'`;
+  // console.log(sql);
+  let query = db.query(sql, (err, result) => {
+    if (err) throw err;
+
+    res.send(change);
+  });
 };
 
 exports.deleteOne = (req, res, next) => {

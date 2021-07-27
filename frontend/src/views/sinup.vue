@@ -97,8 +97,8 @@ export default {
   data() {
     return {
       mode: "login",
-      email: "",
-      password: "",
+      email: "thithi-98@hotmail.fr",
+      password: "mdp",
       identifiant: "",
       etatBtn: false,
       err: false,

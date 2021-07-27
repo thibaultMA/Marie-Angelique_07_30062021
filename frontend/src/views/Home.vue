@@ -160,7 +160,6 @@ export default {
             .then((res) => res.json())
             .then((MSGS) => {          
                 this.fetchUser(MSGS[0])
-                console.log(i);
             if (i == 29) {
               console.log(MSGS);
 

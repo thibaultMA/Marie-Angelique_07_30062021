@@ -16,6 +16,7 @@ export default {
   methods:{
     kickComs(){
         this.$store.commit("kickComs")
+
     },
 
   },

@@ -27,11 +27,16 @@ export default createStore({
       
       state.user = userData.user;
       state.userID = userData.user.id;
-      console.log("userData",state.user);
       state.login = true;
     },
     reset:(state)=>{
       state
+    },
+    modifUser(state,newData){
+      state,newData
+      console.log(newData);
+      state.user.name = newData.userName;
+      state.user.email = newData.email;
     }
   },
   actions: {
