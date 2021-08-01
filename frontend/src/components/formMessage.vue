@@ -18,35 +18,27 @@ export default {
     },
     methods:{
 
-       addmessage(e){
-           if (this.$store.state.login == false) {
-               let conf= confirm("vous n'ete pas connecté voulez vous etre rediriger vers la page de connexion ?")
-
-              if (conf) {
-                //   alert('tres bien')
-                this.$store.commit("kickComs")
-                this.$router.push('/sinup')
-              } else {
-                  e.preventDefault()
-              }
-           }
-           else if(this.content !=""){
+       addmessage(){
+            if(this.content !=""){
                let pourMSG="message"
+
                //si com
                if (this.destination != pourMSG) {
+                   
                 let message = {
                     userid:this.$store.state.userID,
                     messageid:this.ceMessage.id,
-                    content:this.content
+                    content:this.content.trim()
                 }
                 const options = {
                     method: 'POST',
                     body: JSON.stringify(message),
                     headers: {
                         'Content-Type': 'application/json',
-                        
+                         'authorization':`Bearer ${this.$store.state.token}`
                     }
                 }
+                
                 fetch(`http://localhost:3000/message/${this.ceMessage.id}/postCOM`,options)
                 .then(()=>{
                     this.$emit('maj')
@@ -54,12 +46,10 @@ export default {
                 })
                }//si message
                else{
-                //   console.log(this.content);
-                //   console.log(this.$store.state.userID);
-
+                   
                 let message = {
                     userid:this.$store.state.userID,
-                    content:this.content
+                    content:this.content.trim()
                 }
                 // console.log(this.$store.state.token);
                 const options = {
@@ -67,13 +57,12 @@ export default {
                     body: JSON.stringify(message),
                     headers: {
                         'Content-Type': 'application/json',
-                        authorization:this.$store.state.token
+                        'authorization':`Bearer ${this.$store.state.token}`
                     }
                 }
                 fetch('http://localhost:3000/message/post',options)
                 .then(res=>res.json())
                 .then((res)=>{
-                    // console.log(res.insertId);
                     this.$emit('maj',res.insertId)
                     this.content =""
                 })            
@@ -121,7 +110,7 @@ export default {
                 }
             }
             .submit{
-                background-color: #42b983db;
+                background-color: #42b983;
                 color: #f0f0f0;
                 border: none;
                 border-radius: 20px;

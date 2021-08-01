@@ -14,9 +14,6 @@
     </div>
     <div class="userMessage">
       <Coms v-if="$store.state.etat" :message="messagecom"/>
-      <!-- <div class="BGcoms" v-if="$store.state.etat"  @click="kickComs"></div> -->
-    
-      
       <router-view @affcoms="affcoms"></router-view>
     </div>
   </div>
@@ -42,7 +39,6 @@ export default {
       document.location="/"
     },
     affcoms(message,user){
-      console.log("yess ",message,user);
       this.messagecom = {message,user}
       this.$store.commit("affcom")
     },    
@@ -118,36 +114,15 @@ export default {
         method: 'PUT',
         body: JSON.stringify(body),
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+            'authorization':`Bearer ${this.$store.state.token}`
         }
     }
     fetch(`http://localhost:3000/message/${mess.id}/like`,options)
     },
-    fetchMesUser(){
-      fetch("http://localhost:3000/test")
-      .then(res=>res.json())
-      .then(nbr=>{
-        let grandId = nbr.max
-        let petitId= nbr.min
-        let ceMessage = nbr.max
-        ceMessage,petitId
-        grandId
-        for (let i = grandId; i >= petitId; i--) { 
-          
-          fetch(`http://localhost:3000/message/user/${this.userID}/id/${i}`)
-          .then(res=>res.json())
-          .then(data=>{
-
-            if(data.length != 0){
-              this.msg.push(data[0])
-            }
-          })
-        }
-      })
-    }
+    
   },
   mounted(){
-this.fetchMesUser()
   }
 }
 </script>

@@ -1,14 +1,14 @@
 <template>
   <div id="message" @scroll="voir()">
 
-    <Coms v-if="this.$store.state.etat" :message="messagecom"/>
+    <Coms v-if="this.$store.state.etat" :message="messagecom" :refrechCom="refrech" @adminVadmid="test"/>
      <svg class="scrollTop" @click="scrolltop" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="arrow-circle-up"  role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path fill="currentColor" d="M8 256C8 119 119 8 256 8s248 111 248 248-111 248-248 248S8 393 8 256zm143.6 28.9l72.4-75.5V392c0 13.3 10.7 24 24 24h16c13.3 0 24-10.7 24-24V209.4l72.4 75.5c9.3 9.7 24.8 9.9 34.3.4l10.9-11c9.4-9.4 9.4-24.6 0-33.9L273 107.7c-9.4-9.4-24.6-9.4-33.9 0L106.3 240.4c-9.4 9.4-9.4 24.6 0 33.9l10.9 11c9.6 9.5 25.1 9.3 34.4-.4z"></path></svg>
     <FormMsg :destination="'message'" @maj="relanceFetch"/>
-
+    <Confirm class="confirm" v-if="$store.state.adminLog" :modifications="delDistination" :delmessage='dellMSG' @maj="relanceFetch" @majCom='refrechCom'/>
     <div class="boxMessage" v-if="allMessage.length != 0">
        
       <div  v-for="mess in allMessage" :key="mess.id" class="message">
-
+        
         <p class="messageContent"> <b class="userName">{{ mess.user.name }} : </b> {{ mess.MSG.content }}</p>
 
         <div class="like">
@@ -20,6 +20,8 @@
           <p class="nbrlike">{{ mess.MSG.nbrDisLike }}</p>
           <!-- afficher les coms -->
           <svg @click="affcoms(mess.MSG ,mess.user)" aria-hidden="true" focusable="false" data-prefix="fas" data-icon="comment-dots" class="btn" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M256 32C114.6 32 0 125.1 0 240c0 49.6 21.4 95 57 130.7C44.5 421.1 2.7 466 2.2 466.5c-2.2 2.3-2.8 5.7-1.5 8.7S4.8 480 8 480c66.3 0 116-31.8 140.6-51.4 32.7 12.3 69 19.4 107.4 19.4 141.4 0 256-93.1 256-208S397.4 32 256 32zM128 272c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm128 0c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32zm128 0c-17.7 0-32-14.3-32-32s14.3-32 32-32 32 14.3 32 32-14.3 32-32 32z"></path></svg>
+        
+        <button v-if="this.$store.state.user.niveau == 1" class="admin" @click="admindel(mess)">X</button>
         </div>
       </div>
     </div>
@@ -29,25 +31,55 @@
 <script>
 import Coms from "../components/coms.vue";
 import FormMsg from "../components/formMessage.vue";
+import Confirm from "../components/userComopo/confirm.vue";
 export default {
     name:"home",
     components:{
-            Coms,FormMsg
+            Coms,FormMsg,Confirm
     },
   data() {
     return { 
         allMessage: [] ,
-        messagecom:null
+        messagecom:null,
+        adminLog:false,
+        delDistination:null,
+        dellMSG:null,
+        refrech:null
     };
   },
   computed: {},
 
   methods: {
+    test(el){
+      console.log(el);
+      this.dellMSG = el.dellCom
+      this.delDistination = el.destination
+    },
+    admindel(mess){
+      if (this.$store.state.user.niveau == 1) {
+        this.dellMSG = mess.MSG.id
+        this.delDistination = "delMess"
+        this.$store.state.adminLog=true
+        this.$store.state.etatAdmin = true
+        
+      } 
+    },
     scrolltop(){
       window.scrollTo(0,0)   
   },
+    refrechCom(){
+      this.refrech = true
+      setTimeout(() => {
+        this.refrech = false
+        
+        }, 5);
+    },
     relanceFetch(){
+      this.allMessage=[]
       this.fetchAllMSGS()
+      this.$store.state.etat =false
+      this.adminLog=false
+      this.$store.state.adminLog=false
     },
     like(like ,message,e) {
       if (this.$store.state.login == false) {
@@ -109,8 +141,8 @@ export default {
       let body={
         nbrLike,
         nbrDisLike,
-        userLike,
-        userDisLike
+        userLike:JSON.stringify(userLike),
+        userDisLike:JSON.stringify(userDisLike)
       }
       message={
         ...message,
@@ -125,7 +157,8 @@ export default {
         method: 'PUT',
         body: JSON.stringify(body),
         headers: {
-            'Content-Type': 'application/json'
+            'Content-Type': 'application/json',
+             'authorization':`Bearer ${this.$store.state.token}`
         }
     }
     fetch(`http://localhost:3000/message/${message.id}/like`,options)
@@ -137,39 +170,33 @@ export default {
       this.$store.commit("affcom")
     },
     fetchUser(MSG){
-      // console.log(MSG);
       fetch(`http://localhost:3000/users/${MSG.userid}`).then(res=>res.json())
             .then(users=>{
-              let user = users[0]
-              MSG={MSG,user}
-              
-              this.allMessage.push(MSG) 
+              let user = users
+              let mess={MSG,user}
+              this.allMessage.push(mess)
+              this.allMessage.sort((a,b)=>{return b.MSG.id - a.MSG.id})
             })
             .catch(res=>console.log("echec res : ",res))
     },
      fetchAllMSGS(){
-      this.allMessage = []
-        fetch("http://localhost:3000/test")
-      .then(res=>res.json())
-      .then(nbr=>{
-        if (nbr.max != "null") {
-          let grandId = parseInt(nbr.max)
-          let petitId= parseInt(nbr.min)
-          for (let i = grandId; i >= petitId; i--) { 
-            fetch(`http://localhost:3000/message/${i}`)
-            .then((res) => res.json())
-            .then((MSGS) => {          
-                this.fetchUser(MSGS[0])
-            if (i == 29) {
-              console.log(MSGS);
-
-            }
-            })
-            .catch(err=>console.log(err))
-          }
+       this.allMessage = []
+       const options = {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'authorization':`Bearer ${this.$store.state.token}`
         }
-        
-      })
+      }
+      fetch("http://localhost:3000/message",options)
+            .then((res) => res.json())
+            .then((MSGS) => { 
+              MSGS.sort((a,b)=>{return b.id - a.id})
+              MSGS.forEach(MSG => {
+                this.fetchUser(MSG)
+              });
+            })
+            .catch(err=>console.log("err",err))
     }
 
     
@@ -191,7 +218,17 @@ export default {
   max-width: 1050px;
   margin: auto;
   margin-top: auto;
-
+  .confirm{
+      position: fixed;
+      z-index: 9;
+      left: 30%;
+      right: 30%;
+      text-align: center;
+      background-color: #fff;
+      border: solid 1px;
+      width: auto;
+      min-width: 205px;
+  }
   #forMSG > form{
     padding-top:30px;
 
@@ -247,11 +284,19 @@ export default {
           font-size: 13px;
         }
         :nth-child(even){
-          margin:  10px 10px 10px 3px;
+          margin:  10px 10px 10px 5px;
         }
       }
+      
     }
   }
+}
+.admin{
+        background-color: #ff000091;
+        color: white;
+        border: none;
+        cursor: pointer;
+        
 }
 @media (max-width: 485px) {
   #message{

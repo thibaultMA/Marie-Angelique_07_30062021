@@ -1,27 +1,31 @@
-const express = require("express");
-var bodyParser = require("body-parser");
+const express = require('express')
 require('dotenv').config()
-const userRoutes = require("./routes/users");
-const msgRoutes = require("./routes/message");
-const testRoutes = require("./routes/test");
+const app = express()
+var bodyParser = require("body-parser");
 
-const app = express();
+const db = require('./models')
+
+const userRoute = require('./router/user')
+const messageRoute = require('./router/message')
+
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
-  );
-  res.setHeader(
-    "Access-Control-Allow-Methods",
-    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-  );
-  next();
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
+    );
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+    );
+    next();
 });
 
 app.use(bodyParser.json());
-app.use("/users", userRoutes);
-app.use("/message", msgRoutes);
-app.use("/test", testRoutes);
 
+// routes
+app.use('/users',userRoute)
+app.use('/message',messageRoute)
+
+db.sequelize.sync().then()
 module.exports = app;

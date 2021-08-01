@@ -4,11 +4,12 @@ export default createStore({
   
   state: {
     etat: false,
+    etatAdmin:false,
+    adminLog:false,
     user: {
       id: null,
       name: null,
       email:null,
-      password:null
     },
     userID: "",
     login: false,
@@ -22,12 +23,21 @@ export default createStore({
     },
     kickComs: (state) => {
       state.etat = false;
+      state.etatAdmin = false;
+      state.adminLog = false;
     },
-    getUer: (state, userData) => {
+    getUer: (state, user) => {
       
-      state.user = userData.user;
-      state.userID = userData.user.id;
+      state.user.id =user.id;
+      state.user.email = user.email
+      state.user.name = user.name
+      state.user.niveau = user.niveau
+
+      state.userID = user.id;
+      state.token = user.token
+      
       state.login = true;
+      
     },
     reset:(state)=>{
       state
@@ -35,21 +45,20 @@ export default createStore({
     modifUser(state,newData){
       state,newData
       console.log(newData);
-      state.user.name = newData.userName;
+      state.user.name = newData.name;
       state.user.email = newData.email;
     }
   },
   actions: {
     fetchIdUser(store, User) {
       store;
-      fetch(`http://localhost:3000/users/${User.userId}`)
+      fetch(`http://localhost:3000/users/${User.id}`)
         .then((res) => res.json())
         .then((user) => {
-          let userData = {
-            user: user[0],
-          };
-          this.commit("getUer", userData);
-        });
+        
+          this.commit("getUer", user);
+        })
+        .catch(err=>console.log(err))
     },
   },
 });

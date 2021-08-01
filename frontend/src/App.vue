@@ -7,7 +7,7 @@
       <router-link to="/sinup" v-if="this.$store.state.user.name == null">sinup</router-link>
       <router-link to="/user" v-else>Profil</router-link>
     </div>
-    <div class="BGcoms" v-if="$store.state.etat"  @click="kickComs"></div>
+    <div class="BGcoms" v-if="$store.state.etat ||$store.state.etatAdmin"  @click="kickComs"></div>
     <router-view />
   </div>
 </template>

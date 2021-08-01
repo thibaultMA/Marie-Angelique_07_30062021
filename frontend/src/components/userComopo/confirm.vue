@@ -1,6 +1,7 @@
 <template>
   <div id="confirm">
       <h1>confirmez les modifications</h1>
+
       <form @submit.prevent="islog()" class="form">
         <p class="err" v-if="log=='fail'"> mot de passe ou identifient incorrect</p>
         <div class="formAdresse">
@@ -22,6 +23,7 @@
             placeholder="mot de passe"
             autocomplete="on"
             class="input password"
+            @keydown.enter="islog()"
           />
         </div>
       </form>
@@ -39,97 +41,108 @@
 
 <script>
 export default {
-    props:["modifications"],
+    props:["modifications","delmessage"],
     data(){
         return{
-            email:"thithi-98@hotmail.fr",
-            password:"mdp",
+            email:"",
+            password:"",
             log:null
         }
     },
     methods:{
-        testUser(){
-            let bodyLogin = {
-        email: this.email,
-        password: this.password,
-      };
-        
+      testUser(){
+        let bodyLogin = {
+          email: this.email.trim(),
+          password: this.password.trim(),
+        };
         const options = {
-            method: "POST",
-            body: JSON.stringify(bodyLogin),
-            headers: {
-            "Content-Type": "application/json",
-            },
+          method: "POST",
+          body: JSON.stringify(bodyLogin),
+          headers: {
+          "Content-Type": "application/json",
+          'authorization':`Bearer ${this.$store.state.token}`
+          },
         }
-        fetch(`http://localhost:3000/users/auth`, options)
-       .then((res) => res.json())
-       .then(user=>{
-            if (!user.error == false) {
-            this.err = "identifient ou mot de passe incorrect";
-              this.log = 'fail'
-            return;
-          }else{
+        fetch(`http://localhost:3000/users/test`, options)
+        .then(res=>res.json())
+        .then(user=>{
+          if (user.email == this.$store.state.user.email) {
             console.log(this.modifications);
-            if (user.userId == this.$store.state.user.id) {
-              if (this.modifications == "delete") {
-                
-              
-           
-              let body={
-                userID:this.$store.state.user.id
-            }
-            const options = { 
-                    method: 'DELETE',
-                    body: JSON.stringify(body),
-                    headers: {
-                        'Content-Type': 'application/json',
-                    }
+            if (this.modifications == "delete") {
+              let optionsDelet={
+                method: "DELETE",
+                headers: {
+                  "Content-Type": "application/json",
+                  'authorization':`Bearer ${this.$store.state.token}`
+                },
+              }
+              fetch(`http://localhost:3000/users/${this.$store.state.userID}/delete`,optionsDelet)
+              .then(res=>{
+                if (res.ok) {
+                  window.location = "/"
+                  return
                 }
-            fetch(`http://localhost:3000/message/com/dell`,options)
-            .then(res=>{
-                    if (res.ok) {
-                      console.log("ok");
-                        // console.log(body);
-                        fetch('http://localhost:3000/message/messsage/dell',options)
-                        .then(res=>{
-                            if (res.ok) {
-                              console.log("ok");
-                                fetch(`http://localhost:3000/users/delete/${this.userID}`,options)
-                                .then(res=>{
-                                    if (res.ok) {
-                                      console.log("ok");
-                                        window.location = "/"
-                                    }
-                                })
-                            }
-                        })
-                    }
-            })
+              })
+              
+            }
+            if (this.modifications == "delMess") {
+              console.log("vu");
+              let delMessage = {
+                method: "DELETE",
+                headers: {
+                  "Content-Type": "application/json",
+                  'authorization':`Bearer ${this.$store.state.token}`
+                },
+              }
+              fetch(`http://localhost:3000/message/${this.delmessage}/delete`,delMessage)
+              .then(res=>{
+                if (res.ok) {
+                  this.$emit('maj')
+                 this.$store.state.etatAdmin = false
+                 console.log(this.$store.state);
+                 return
+                }
+              })
+              
+            }
+            if (this.modifications == "delComm") {
+              let delCom = {
+                method: "DELETE",
+                headers: {
+                  "Content-Type": "application/json",
+                  'authorization':`Bearer ${this.$store.state.token}`
+                },
+              }
+              fetch(`http://localhost:3000/message/com/${this.delmessage}/delete`,delCom)
+              .then(res=>{
+                if (res.ok) {
+                  this.$emit('majCom')
+                  return
+                }
+              })
             }
             else{
-                  const Req = {
-                    method: "PUT",
-                    body: JSON.stringify(this.modifications),
-                    headers: {
-                    "Content-Type": "application/json",
-                    },
-                    
-                }
-                fetch(`http://localhost:3000/users/update/${user.userId}`,Req)
-                .then(res=>res.json())
-                .then(newdata=>{
-                    this.$store.commit("modifUser",newdata)
-                    console.log(this.$store.state);
-                    this.$router.push('/') 
-                })
-                .catch(err=>console.log(err))
+              console.log(this.modifications);
+              let optionsMod = {
+                method: "put",
+                body: JSON.stringify(this.modifications),
+                headers: {
+                "Content-Type": "application/json",
+                'authorization':`Bearer ${this.$store.state.token}`
+                },
+              }
+              fetch(`http://localhost:3000/users/${this.$store.state.userID}/update`, optionsMod)
+              .then(res=>res.json())
+              .then(newData=>{
+                console.log(newData);
+                this.$store.commit("modifUser",newData)
+                this.$router.push('/') 
+                console.log(this.$store.state);
+              })
             }
-            }
-            
-            }
-            
-       })
-    }
+          }
+        })
+      }
     }
 }
 </script>
@@ -137,5 +150,12 @@ export default {
 <style>
 .err{
   color: red;
+}
+.button{
+  border: none;
+  background-color: #42b983;
+  margin: 20px;
+  padding: 5px;
+  width: 140px;
 }
 </style>

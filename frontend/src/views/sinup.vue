@@ -97,9 +97,9 @@ export default {
   data() {
     return {
       mode: "login",
-      email: "thithi-98@hotmail.fr",
+      email: "my@mail.com",
       password: "mdp",
-      identifiant: "",
+      identifiant: "iron",
       etatBtn: false,
       err: false,
     };
@@ -135,8 +135,8 @@ export default {
     },
     login() {
       let body = {
-        email: this.email,
-        password: this.password,
+        email: this.email.trim(),
+        password: this.password.trim(),
       };
       const options = {
         method: "POST",
@@ -152,7 +152,7 @@ export default {
             this.err = "identifient ou mot de passe incorrect";
             return;
           }
-          this.$store.dispatch("fetchIdUser", user);
+          this.$store.commit("getUer", user);
           this.email = "";
           this.identifiant = "";
           this.password = "";
@@ -162,24 +162,29 @@ export default {
 
     createAcount() {
       let user = {
-        name: this.identifiant,
-        email: this.email,
-        password: this.password,
+        name: this.identifiant.trim(),
+        email: this.email.trim(),
+        password: this.password.trim(),
       };
       const options = {
         method: "POST",
         body: JSON.stringify(user),
         headers: {
           "Content-Type": "application/json",
+          
         },
       };
-      fetch(`http://localhost:3000/users/addpost`, options).then((res) => {
+      fetch(`http://localhost:3000/users/addpost`, options)
+      .then((res) => res.json())
+      .then(res=>{
         if (!res.ok) {
           this.err = "cette email est déjà utilisé";
-        } else {
-          this.login();
         }
-      });
+        else{
+          this.login()
+        }
+      })
+
     },
     switchToCreateAcount() {
       this.mode = "create";

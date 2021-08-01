@@ -1,0 +1,61 @@
+module.exports=(sequelize,DataType)=>{
+    const Message = sequelize.define("Commentaire",{
+        userid:{
+            type:DataType.INTEGER,
+            allowNull:false,
+            references:{
+                model:'Users',
+                key:'id'
+            }
+        },
+        messageid:{
+            type:DataType.INTEGER,
+            allowNull:false,
+            references:{
+                model:'Messages',
+                key:'id'
+            }
+        },
+        content:{
+            type:DataType.STRING,
+            allowNull:false,
+        },
+        nbrLike:{
+            type:DataType.INTEGER,
+            defaultValue:0,
+            allowNull:false,
+        },
+        nbrDisLike:{
+            type:DataType.INTEGER,
+            defaultValue:0,
+            allowNull:false,
+
+        },
+        userLike:{
+            type:DataType.STRING,
+            allowNull:false,
+            defaultValue:"[]",
+        },
+        userDisLike:{
+            type:DataType.STRING,
+            allowNull:false,
+            defaultValue:"[]",
+        },
+    },{
+        classMethods:{
+            associate:(models)=>{
+                models.Commentaire.belongsTo(models.Users,{
+                    foreinKey:{
+                        allowNull:false,
+                    }
+                }),
+                models.Commentaire.belongsTo(models.Message,{
+                    foreinKey:{
+                        allowNull:false,
+                    }
+                })
+            }
+        }
+    })
+    return Message
+}

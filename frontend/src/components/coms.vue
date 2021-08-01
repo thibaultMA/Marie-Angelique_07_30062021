@@ -1,6 +1,6 @@
 <template>
   <div id="comBlock">
-    <!-- {{ message }} -->
+    <!-- {{refrechCom}} -->
     <div class="message ">
       <p class="messageContent"> <b class="userName">{{ message.user.name }} : </b> {{ message.message.content }}</p>
 
@@ -9,6 +9,8 @@
       <h3 id="vide" v-if="commentaires.length == 0">Aucun commentaire pour le moment serez vous le premier ?</h3>
       <div class="commentaire" v-for="comm in commentaires" :key="comm.id">
         <!-- {{ commentaires }} -->
+      
+
         <div class="soloCom">
           <p class="messageContent"> <b class="userName">{{ comm.user.name }} :</b>  <br class="BR"> {{ comm.COM.content }}</p>
           <div class="like">
@@ -17,6 +19,7 @@
             <svg @click="like(-1, comm.COM,$event)"  aria-hidden="true" focusable="false" data-prefix="fas" data-icon="thumbs-down" class="btn" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><path d="M0 56v240c0 13.255 10.745 24 24 24h80c13.255 0 24-10.745 24-24V56c0-13.255-10.745-24-24-24H24C10.745 32 0 42.745 0 56zm40 200c0-13.255 10.745-24 24-24s24 10.745 24 24-10.745 24-24 24-24-10.745-24-24zm272 256c-20.183 0-29.485-39.293-33.931-57.795-5.206-21.666-10.589-44.07-25.393-58.902-32.469-32.524-49.503-73.967-89.117-113.111a11.98 11.98 0 0 1-3.558-8.521V59.901c0-6.541 5.243-11.878 11.783-11.998 15.831-.29 36.694-9.079 52.651-16.178C256.189 17.598 295.709.017 343.995 0h2.844c42.777 0 93.363.413 113.774 29.737 8.392 12.057 10.446 27.034 6.148 44.632 16.312 17.053 25.063 48.863 16.382 74.757 17.544 23.432 19.143 56.132 9.308 79.469l.11.11c11.893 11.949 19.523 31.259 19.439 49.197-.156 30.352-26.157 58.098-59.553 58.098H350.723C358.03 364.34 384 388.132 384 430.548 384 504 336 512 312 512z"></path></svg>
             <p class="nbrlike">{{ comm.COM.nbrDisLike }}</p> 
 
+          <button v-if="this.$store.state.user.niveau == 1 &&this.$router.currentRoute._rawValue.name =='Home'" class="admin" @click="admindel(comm)">X</button>
           </div>
         </div>
       </div>
@@ -33,7 +36,7 @@
 <script>
 import FormMsg from "../components/formMessage.vue";
 export default {
-  props: ["message"],
+  props: ["message","refrechCom"],
   components: {
     FormMsg,
   },
@@ -42,7 +45,22 @@ export default {
       commentaires: [],
     };
   },
+  watch:{ 
+    refrechCom: function() { 
+      this.relanceFetch()
+      this.$store.state.adminLog = false
+    },
+  },
   methods: {
+    admindel(mess){
+      if (this.$store.state.user.niveau == 1) {
+
+        this.$emit("adminVadmid",{destination:"delComm",dellCom:mess.COM.id})
+        this.$store.state.adminLog=true
+        this.$store.state.etatAdmin = true
+        document.querySelector("#app > div > div.BGcoms").style.zIndex = "8"
+      } 
+    },
     like(like, com, e) {
       if (this.$store.state.login == false) {
         let conf = confirm(
@@ -57,19 +75,17 @@ export default {
         }
       } else {
         let USERID = this.$store.state.userID;
-
         let nbrLike = com.nbrLike;
         let userLike = JSON.parse(com.userLike);
         let nbrDisLike = com.nbrDisLike;
         let userDisLike = JSON.parse(com.userDisLike);
-
         //si like
         if (like === 1) {
           //if deja like
           if (userLike.indexOf(USERID) === -1) {
             nbrLike++;
             userLike.push(USERID);
-
+ 
             // si deja dislike
             if (userDisLike.indexOf(USERID) != -1) {
               let dell = userDisLike.indexOf(USERID);
@@ -104,8 +120,8 @@ export default {
         let body = {
           nbrLike,
           nbrDisLike,
-          userLike,
-          userDisLike,
+          userLike:JSON.stringify(userLike),
+          userDisLike:JSON.stringify(userDisLike),
         };
         com = {
           ...com,
@@ -120,24 +136,31 @@ export default {
           body: JSON.stringify(body),
           headers: {
             "Content-Type": "application/json",
+             'authorization':`Bearer ${this.$store.state.token}`
           },
         };
         fetch(
-          `http://localhost:3000/message/${this.message.message.id}/${com.id}/like`,
+          `http://localhost:3000/message/${com.id}/comLike`,
+
           options
         );
       }
     },
     relanceFetch() {
       this.fetchAll();
+      
+    
+      this.$store.state.adminLog=false
+      this.$store.state.etatAdmin = false
+    
+      document.querySelector("#app > div > div.BGcoms").style.zIndex = "6"
     },
     fetchUser(COM) {
       fetch(`http://localhost:3000/users/${COM.userid}`)
         .then((res) => res.json())
         .then((users) => {
-          let user = users[0];
+          let user = users;
           COM = { COM, user };
-          
           this.commentaires.push(COM);
         });
     },
@@ -165,15 +188,14 @@ export default {
   flex-flow: column;
   justify-content: space-between;
   position: fixed;
-  z-index: 10;
+  z-index: 7;
   color: #000;
   background-color: #dadada;
-
+  text-align: initial;
   top: 9vh;
   left:25%;
   right: 25%;
   bottom: 20vh;
-  // overflow-y: auto;
   border-radius: 10px;
   .message {
     background-color: #fff;
