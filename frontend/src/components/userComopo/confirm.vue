@@ -118,9 +118,9 @@ export default {
                 headers: {
                   "Content-Type": "application/json",
                   'authorization':`Bearer ${this.$store.state.token}`
-                },
+                }, 
               }
-              fetch(`http://localhost:3000/message/com/${this.delmessage}/delete`,delCom)
+              fetch(`http://localhost:3000/message/com/${this.delmessage}/delete`,delCom) 
               .then(res=>{
                 if (res.ok) {
                   this.$emit('majCom')

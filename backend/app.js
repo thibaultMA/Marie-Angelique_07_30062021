@@ -3,7 +3,6 @@ require('dotenv').config()
 const app = express()
 const helmet = require("helmet");
 var bodyParser = require("body-parser");
-var sqlinjection = require('sql-injection');
 
 const db = require('./models')
 
@@ -27,7 +26,6 @@ app.use((req, res, next) => {
 
 
 
-app.use(sqlinjection);
 app.use(bodyParser.json());
 app.use(helmet());
 // routes

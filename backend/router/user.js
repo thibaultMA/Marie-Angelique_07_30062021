@@ -13,8 +13,8 @@ const limiter = rateLimit({
 const userCTRL = require('../controllers/user');
 
 router.get('/:id'       ,limiter,userCTRL.getOneid)
-router.post('/addpost'  ,limiter,userCTRL.addOne)
-router.post('/auth'     ,limiter,userCTRL.login)
+router.post('/addpost'  ,userCTRL.addOne)
+router.post('/auth'     ,userCTRL.login)
 router.post('/test'     ,limiter,auth.test,userCTRL.test)
 router.put('/:id/update',limiter,auth.test,userCTRL.update)
 

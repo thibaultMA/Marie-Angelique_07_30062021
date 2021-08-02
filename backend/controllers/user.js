@@ -27,7 +27,7 @@ exports.addOne = (req, res, next) => {
 exports.login = (req, res, next) => {
     let email = req.body.email
     let password = req.body.password
-     
+     console.log(req.body);
     Users.findOne({where:{email:email}})
     .then(userFound=>{
         if (userFound) {
