@@ -88,7 +88,7 @@ body {
       flex: 1;
       text-align: center;
       &.router-link-exact-active {
-      color: #42b983;
+      color: #FD2D01;
       // border: black solid;
     }
     }

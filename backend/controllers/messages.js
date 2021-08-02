@@ -1,4 +1,4 @@
-const {Message ,Commentaire} = require('../models')
+const {Users,Message ,Commentaire} = require('../models')
 
 exports.getall=(req, res) => {
     Message.findAll()
@@ -32,20 +32,32 @@ exports.like=(req,res)=>{
     })
 }
 exports.delete=(req,res)=>{
-    Commentaire.destroy({
+    Users.findOne({
         where:{
-            messageid:req.params.id
+            id:req.body.id
         },
     })
-    .then(()=>{
-        Message.destroy({
+    .then(userFound=>{
+        if (userFound.id == req.body.id && userFound.niveau == 2 &&req.body.niveau == 1) {
+            Commentaire.destroy({
             where:{
-                id:req.params.id
+                messageid:req.params.id
             },
-    
-        })
-        .then(()=>res.send("ok"))
+            })
+            .then(()=>{
+                Message.destroy({
+                    where:{
+                        id:req.params.id
+                    },
+        
+                })
+                .then(()=>res.send("ok"))
+            })
+        }
+        else{throw 'vous n\' avez pas les droits'}
     })
+    .catch(err=>res.status(401).json({err}))
+    
     
     
 }

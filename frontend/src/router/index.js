@@ -22,14 +22,7 @@ const routes = [
     meta:{
       title:"sinup"
     },
-    beforeRouteUpdate (to, from, next) {
-      // utiliser juste `this`
-        console.log("to",to);
-    console.log("from",from);
-      console.log(this.store.userID );
-      // this.store.userID != "" 
-      next()
-    }
+
   },{
     path: '/user',
     name: 'user',
@@ -71,8 +64,11 @@ const router = createRouter({
   routes
 })
 router.afterEach((to)=>{
-  if (to.path == "/user" && store.state.login==false) {
-    router.push('/_ogy-jiojiop')
+  if (to.path == "/user" && store.state.login == false) {
+    router.push('/sinup')
+  }
+  if (to.path == "/" && store.state.login == false) {
+    router.push('/sinup')
   }
 })
 export default router

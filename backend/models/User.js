@@ -3,6 +3,7 @@ module.exports=(sequelize,DataType)=>{
         name:{
             type:DataType.STRING,
             allowNull:false,
+           
             validate:{
                 notEmpty:true
             }
@@ -10,6 +11,7 @@ module.exports=(sequelize,DataType)=>{
         email:{
             type:DataType.STRING,
             allowNull:false,
+            unique: true,
             validate:{
                 notEmpty:true
             }

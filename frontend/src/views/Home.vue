@@ -177,7 +177,10 @@ export default {
               this.allMessage.push(mess)
               this.allMessage.sort((a,b)=>{return b.MSG.id - a.MSG.id})
             })
-            .catch(res=>console.log("echec res : ",res))
+            .catch(res=>{
+              console.log("echec res : ",res)
+              this.$router.push('/sinup')
+            })
     },
      fetchAllMSGS(){
        this.allMessage = []
@@ -214,7 +217,7 @@ export default {
   display: flex;
   flex-flow: column;
   // align-items: center;
-  background-color: #ddeae4;
+  background-color: #fd2b0118;
   max-width: 1050px;
   margin: auto;
   margin-top: auto;
@@ -275,7 +278,7 @@ export default {
 
         }
         .btn:hover{
-            fill: #42b983   ;  
+            fill: #FD2D01   ;  
             transition: .15s;     
             height: 20px;
             

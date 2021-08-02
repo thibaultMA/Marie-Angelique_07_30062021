@@ -36,7 +36,7 @@ export default {
   methods:{
         deco(){
       this.$store.commit('reset')
-      document.location="/"
+      document.location="/sinup"
     },
     affcoms(message,user){
       this.messagecom = {message,user}
@@ -153,8 +153,8 @@ export default {
     }
     .Amid{border-left: solid #bababa 1px;border-right:#bababa solid 1px;}
     .router-link-active{
-       color: darkgreen;
-      background-color: #cfddd7;
+       color: #EB5233;
+      background-color: #fd2b0118;
       // border-top: black 1px solid;
     } 
      
@@ -184,7 +184,7 @@ export default {
       overflow-y: auto;
       min-height: 155px;
       
-      background-color: #cfddd7;
+      background-color: #fd2b0118;
       .Usermessage {
       margin: 20px;
       background-color: #fff;
@@ -214,7 +214,7 @@ export default {
 
     }
     .btn:hover{
-      fill: #42b983   ;  
+      fill: #FD2D01   ;  
       transition: .15s;     
       height: 20px;
     }
@@ -232,7 +232,7 @@ export default {
   background: #bccac4;
 }
 ::-webkit-scrollbar-thumb {
-  background: #42b983;
+  background: #FD2D01;
   border-radius: 10px;
 }
     

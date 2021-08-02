@@ -11,6 +11,7 @@ exports.getOneid = (req, res, next) => {
 }
 exports.addOne = (req, res, next) => {
     let user = req.body
+    console.log(user);
     bcrypt.hash(user.password,10)
     .then(hash=>{
         Users.create({
@@ -74,38 +75,47 @@ exports.test = (req, res, next) => {
     .catch(err=>res.status(500).send(err))
 } 
 exports.update=(req,res)=>{
+    console.log(req.body.userID);
    Users.findOne({where:{id:req.params.id}})
-    .then(userFound=>
-        userFound.update({
-            name:req.body.userName
-        })
-        .then(data=>{
-            console.log(data);
-            res.send(data)
-        })
-       
-    )
+    .then(userFound=>{
+        if (userFound.id == req.body.userID) {
+            userFound.update({
+                name:req.body.userName
+            })
+            .then(data=>{
+                console.log(data);
+                res.send(data)
+            })
+        }
+        else{res.status(400).send(new Error('fail'))}
+    }).catch(err=>console.log(5415,err))
     
 }
 exports.delete=(req,res)=>{
-    Commentaire.destroy({
+    console.log(req.body.id);
+    Users.findOne({
         where:{
-            userid:req.params.id
-        },
+            id:req.params.id
+        }
     })
-    .then(()=>{
-        Message.destroy({
-            where:{
-                userid:req.params.id
-            },
-        })
-        .then(()=>{
-            Users.destroy({
-                where:{
-                    id:req.params.id
-                },
-            })
-            .then(()=>res.send("ok"))
-        })
+    .then(userFound=>{
+        if (userFound.id == req.body.id) {
+           Commentaire.destroy({where:{userid:req.body.id}})
+           .then(response=>{
+                Message.destroy({where:{userid :req.body.id }})
+                .then(response=>{
+                    Users.destroy({where:{id : req.body.id }})
+                    .then(response=>{
+                        console.log(response);
+                        res.send("ok")
+                    })
+                    .catch(err=>console.log("user err ",err))
+                })
+                .catch(err=>console.log("message err",err))
+           })
+           .catch(err=>console.log("com err",err))
+        }
+        else res.send("user not found")
     })
+    .catch(err=>console.log(err))
 }

@@ -10,6 +10,8 @@ export default createStore({
       id: null,
       name: null,
       email:null,
+      niveau:null,
+      token:null
     },
     userID: "",
     login: false,
@@ -32,7 +34,8 @@ export default createStore({
       state.user.email = user.email
       state.user.name = user.name
       state.user.niveau = user.niveau
-
+      state.user.token = user.token
+      
       state.userID = user.id;
       state.token = user.token
       
@@ -49,16 +52,5 @@ export default createStore({
       state.user.email = newData.email;
     }
   },
-  actions: {
-    fetchIdUser(store, User) {
-      store;
-      fetch(`http://localhost:3000/users/${User.id}`)
-        .then((res) => res.json())
-        .then((user) => {
-        
-          this.commit("getUer", user);
-        })
-        .catch(err=>console.log(err))
-    },
-  },
+  
 });

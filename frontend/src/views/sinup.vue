@@ -174,6 +174,7 @@ export default {
           
         },
       };
+      console.log(user);
       fetch(`http://localhost:3000/users/addpost`, options)
       .then((res) => res.json())
       .then(res=>{
@@ -209,11 +210,11 @@ export default {
     border-radius: 10px;
     .logo {
       height: 100px;
-      fill: #42b983;
+      fill: #FD2D01;
       
     }
     .switch {
-      color: #42b983;
+      color: #FD2D01;
       cursor: pointer;
     }
     .form {
@@ -231,7 +232,7 @@ export default {
     }
     .button {
       color: #f0f0f0;
-      background-color: #42b983;
+      background-color: #FD2D01;
       padding: 5px;
       width: 130px;
       border: none;

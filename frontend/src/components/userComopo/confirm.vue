@@ -44,17 +44,21 @@ export default {
     props:["modifications","delmessage"],
     data(){
         return{
-            email:"",
-            password:"",
+            email:this.$store.state.user.email,
+            password:"mdp",
             log:null
         }
     },
     methods:{
       testUser(){
+        console.log(this.modifications);
         let bodyLogin = {
           email: this.email.trim(),
           password: this.password.trim(),
         };
+        let bodyDEL = {
+                ...this.$store.state.user
+        }
         const options = {
           method: "POST",
           body: JSON.stringify(bodyLogin),
@@ -67,17 +71,18 @@ export default {
         .then(res=>res.json())
         .then(user=>{
           if (user.email == this.$store.state.user.email) {
-            console.log(this.modifications);
-            if (this.modifications == "delete") {
+            
+            if (this.modifications == "delete"){
               let optionsDelet={
                 method: "DELETE",
+               body:JSON.stringify(bodyDEL),
                 headers: {
                   "Content-Type": "application/json",
                   'authorization':`Bearer ${this.$store.state.token}`
                 },
               }
               fetch(`http://localhost:3000/users/${this.$store.state.userID}/delete`,optionsDelet)
-              .then(res=>{
+              .then(res=>{console.log(res);
                 if (res.ok) {
                   window.location = "/"
                   return
@@ -89,6 +94,7 @@ export default {
               console.log("vu");
               let delMessage = {
                 method: "DELETE",
+                body:JSON.stringify(bodyDEL),
                 headers: {
                   "Content-Type": "application/json",
                   'authorization':`Bearer ${this.$store.state.token}`
@@ -96,18 +102,19 @@ export default {
               }
               fetch(`http://localhost:3000/message/${this.delmessage}/delete`,delMessage)
               .then(res=>{
+                console.log(res);
                 if (res.ok) {
                   this.$emit('maj')
-                 this.$store.state.etatAdmin = false
-                 console.log(this.$store.state);
-                 return
+                  this.$store.state.etatAdmin = false
+                 
                 }
+                else{ this.log = "fail"}
               })
-              
             }
             if (this.modifications == "delComm") {
               let delCom = {
                 method: "DELETE",
+                body:JSON.stringify(bodyDEL),
                 headers: {
                   "Content-Type": "application/json",
                   'authorization':`Bearer ${this.$store.state.token}`
@@ -117,12 +124,14 @@ export default {
               .then(res=>{
                 if (res.ok) {
                   this.$emit('majCom')
-                  return
-                }
+                }else throw "identification incorrect"
+              })
+              .catch(err=>{
+                console.log(err);
+                this.log = "fail"
               })
             }
-            else{
-              console.log(this.modifications);
+            if( typeof this.modifications === 'object' && this.modifications !== null){
               let optionsMod = {
                 method: "put",
                 body: JSON.stringify(this.modifications),
@@ -132,12 +141,20 @@ export default {
                 },
               }
               fetch(`http://localhost:3000/users/${this.$store.state.userID}/update`, optionsMod)
-              .then(res=>res.json())
-              .then(newData=>{
-                console.log(newData);
-                this.$store.commit("modifUser",newData)
-                this.$router.push('/') 
-                console.log(this.$store.state);
+              .then(res=> {
+                console.log(res);
+                  if (res.ok) {
+                    res.json()
+                    .then(newData=>{
+                    this.$store.commit("modifUser",newData)
+                    this.$router.push('/') 
+                    console.log(this.$store.state);
+                  })
+                  }else {this.log = "fail"; throw 'identification incorrect'}
+                
+              })
+              .catch(err=>{
+                console.log(err);
               })
             }
           }
@@ -153,7 +170,7 @@ export default {
 }
 .button{
   border: none;
-  background-color: #42b983;
+  background-color: #FD2D01;
   margin: 20px;
   padding: 5px;
   width: 140px;

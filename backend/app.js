@@ -1,12 +1,16 @@
 const express = require('express')
 require('dotenv').config()
 const app = express()
+const helmet = require("helmet");
 var bodyParser = require("body-parser");
+var sqlinjection = require('sql-injection');
 
 const db = require('./models')
 
 const userRoute = require('./router/user')
 const messageRoute = require('./router/message')
+
+
 
 app.use((req, res, next) => {
     res.setHeader("Access-Control-Allow-Origin", "*");
@@ -21,8 +25,11 @@ app.use((req, res, next) => {
     next();
 });
 
-app.use(bodyParser.json());
 
+
+app.use(sqlinjection);
+app.use(bodyParser.json());
+app.use(helmet());
 // routes
 app.use('/users',userRoute)
 app.use('/message',messageRoute)

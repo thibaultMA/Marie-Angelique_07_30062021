@@ -1,6 +1,6 @@
 const jwt=require('jsonwebtoken')
 
-const jwtKey='THIS_SUPER_TOKEN?'
+const jwtKey=process.env.Token
 
 module.exports={
     generateToken:(userData)=>{

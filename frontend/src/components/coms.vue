@@ -3,12 +3,12 @@
     <!-- {{refrechCom}} -->
     <div class="message ">
       <p class="messageContent"> <b class="userName">{{ message.user.name }} : </b> {{ message.message.content }}</p>
-
+{{ commentaires.length}}
     </div>
     <div class="commentBox">
       <h3 id="vide" v-if="commentaires.length == 0">Aucun commentaire pour le moment serez vous le premier ?</h3>
       <div class="commentaire" v-for="comm in commentaires" :key="comm.id">
-        <!-- {{ commentaires }} -->
+        
       
 
         <div class="soloCom">
@@ -43,12 +43,15 @@ export default {
   data() {
     return {
       commentaires: [],
+      check:0
     };
   },
   watch:{ 
     refrechCom: function() { 
-      this.relanceFetch()
-      this.$store.state.adminLog = false
+      console.log('azd');
+      this.check++
+      this.relanceFetch();
+      console.log(this.check%2);
     },
   },
   methods: {
@@ -148,11 +151,9 @@ export default {
     },
     relanceFetch() {
       this.fetchAll();
-      
-    
+      console.log("cic");
       this.$store.state.adminLog=false
       this.$store.state.etatAdmin = false
-    
       document.querySelector("#app > div > div.BGcoms").style.zIndex = "6"
     },
     fetchUser(COM) {
@@ -161,19 +162,34 @@ export default {
         .then((users) => {
           let user = users;
           COM = { COM, user };
-          this.commentaires.push(COM);
+           this.commentaires.push(COM);
+          
         });
     },
-    fetchAll() {
-      fetch(`http://localhost:3000/message/${this.message.message.id}/com`)
+    fetchAll() {if (this.check%2 == 0) {
+           
+          
+      let fetchOpstion={
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          'authorization':`Bearer ${this.$store.state.token}`
+        },
+      }
+      while(this.commentaires.length > 0) {
+        this.commentaires.pop();
+      }
+      fetch(`http://localhost:3000/message/${this.message.message.id}/com`,fetchOpstion)
         .then(res=>res.json())
-        .then(COMS => {
-          this.commentaires.length = 0
+        .then(COMS => { 
+          console.log(this.commentaires);
           COMS.forEach(COM => {
               this.fetchUser(COM)
           });
         });
+        }
     },
+    
   },
   mounted() {
     this.fetchAll();
@@ -225,7 +241,7 @@ export default {
       width: max-content;
       max-width: 80%;
       margin: 7px auto 7px 30px;
-      background-color: #14921e;
+      background-color: #D97664;
       border-radius: 50px;
       color: rgb(224, 224, 224);
       // b{
@@ -249,7 +265,7 @@ export default {
 
         }
         .btn:hover{
-            fill: #0f7002   ;  
+            fill: #FD2D01  ;  
             transition: .15s;     
             height: 16px;
             
