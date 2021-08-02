@@ -3,7 +3,6 @@
     <!-- {{refrechCom}} -->
     <div class="message ">
       <p class="messageContent"> <b class="userName">{{ message.user.name }} : </b> {{ message.message.content }}</p>
-{{ commentaires.length}}
     </div>
     <div class="commentBox">
       <h3 id="vide" v-if="commentaires.length == 0">Aucun commentaire pour le moment serez vous le premier ?</h3>

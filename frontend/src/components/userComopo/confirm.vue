@@ -23,7 +23,6 @@
             placeholder="mot de passe"
             autocomplete="on"
             class="input password"
-            @keydown.enter="islog()"
           />
         </div>
       </form>
@@ -44,8 +43,8 @@ export default {
     props:["modifications","delmessage"],
     data(){
         return{
-            email:this.$store.state.user.email,
-            password:"mdp",
+            email:'',
+            password:"",
             log:null
         }
     },

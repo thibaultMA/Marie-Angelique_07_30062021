@@ -97,9 +97,9 @@ export default {
   data() {
     return {
       mode: "login",
-      email: "my@mail.com",
-      password: "mdp",
-      identifiant: "iron",
+      email: "", 
+      password: "",
+      identifiant: "",
       etatBtn: false,
       err: false,
     };

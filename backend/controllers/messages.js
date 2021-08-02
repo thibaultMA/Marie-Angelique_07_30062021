@@ -38,7 +38,7 @@ exports.delete=(req,res)=>{
         },
     })
     .then(userFound=>{
-        if (userFound.id == req.body.id && userFound.niveau == 2 &&req.body.niveau == 1) {
+        if (userFound.id == req.body.id && userFound.niveau == 1 &&req.body.niveau == 1) {
             Commentaire.destroy({
             where:{
                 messageid:req.params.id
